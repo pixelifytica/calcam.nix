@@ -37,5 +37,6 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/
     cp -R * $out/
+    for file in $out/bin/*; do wrapProgram "$file" --prefix QT_QPA_PLATFORM : "xcb"; done
   '';
 }
