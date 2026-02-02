@@ -44,11 +44,13 @@
       devShells = forAllSystems (system: {
         default =
           let
-            inherit (pkgs.${system}.qt6Packages) qtbase;
+            inherit (pkgs.${system}) mkShellNoCC python3;
           in
-          pkgs.${system}.mkShellNoCC {
-            env.QT_QPA_PLATFORM_PLUGIN_PATH = "${qtbase.bin}/lib/qt-${qtbase.version}/plugins";
-            packages = [ (pkgs.${system}.python3.withPackages (ps: [ ps.calcam ])) ];
+          mkShellNoCC {
+            packages = [
+              self.packages.${system}.calcam
+              (python3.withPackages (ps: [ ps.calcam ]))
+            ];
           };
       });
     };
