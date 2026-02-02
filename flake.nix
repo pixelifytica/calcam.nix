@@ -20,25 +20,9 @@
         default = (
           final: prev:
           {
-            calcam =
-              let
-                python3 = (final.python3.withPackages (ps: [ ps.calcam ]));
-              in
-              final.symlinkJoin {
-                name = "calcam";
-                paths = [
-                  python3
-                  (python3.pkgs.toPythonApplication python3.pkgs.calcam)
-                ];
-                buildInputs = [
-                  final.libsForQt5.wrapQtAppsHook
-                  final.libsForQt5.qtbase
-                  final.libsForQt5.qtwayland
-                ];
-                postBuild = ''
-                  wrapQtApp $out/bin/calcam
-                '';
-              };
+            calcam-qt5 = final.libsForQt5.callPackage ./calcam-gui.nix { useQt6 = false; };
+            calcam-qt6 = final.qt6Packages.callPackage ./calcam-gui.nix { useQt6 = true; };
+            calcam = final.calcam-qt6;
           }
           // (builtins.listToAttrs (
             map (name: {
@@ -46,7 +30,7 @@
               value = prev.${name}.override {
                 packageOverrides = pfinal: pprev: {
                   triangle = pfinal.callPackage ./triangle.nix { };
-                  calcam = pfinal.callPackage ./calcam.nix { };
+                  calcam = pfinal.callPackage ./calcam-lib.nix { };
                 };
               };
             }) supportedPythons
@@ -54,16 +38,18 @@
         );
       };
       packages = forAllSystems (system: {
-        inherit (pkgs.${system}) calcam;
+        inherit (pkgs.${system}) calcam-qt5 calcam-qt6 calcam;
         default = self.packages.${system}.calcam;
       });
       devShells = forAllSystems (system: {
-        default = pkgs.${system}.mkShellNoCC {
-          packages = [
-            (pkgs.${system}.python3.withPackages (ps: [ ps.calcam ]))
-            pkgs.${system}.calcam
-          ];
-        };
+        default =
+          let
+            inherit (pkgs.${system}.qt6Packages) qtbase;
+          in
+          pkgs.${system}.mkShellNoCC {
+            env.QT_QPA_PLATFORM_PLUGIN_PATH = "${qtbase.bin}/lib/qt-${qtbase.version}/plugins";
+            packages = [ (pkgs.${system}.python3.withPackages (ps: [ ps.calcam ])) ];
+          };
       });
     };
 }

@@ -5,10 +5,12 @@
   scipy,
   matplotlib,
   vtk,
-  pyqt5,
   opencv-python-headless,
   h5py,
   triangle,
+  useQt6 ? false,
+  pyqt5,
+  pyqt6,
   ...
 }:
 buildPythonPackage rec {
@@ -21,14 +23,15 @@ buildPythonPackage rec {
     tag = "${version}";
     hash = "sha256-/OadKEdAIJBcRvbsSwR9KLMc8HdzUX24pxt6+byOXGI=";
   };
+  dontCheckRuntimeDeps = useQt6;
   build-system = [ setuptools ];
   dependencies = [
     scipy
     matplotlib
     vtk
-    pyqt5
     opencv-python-headless
     h5py
     triangle
-  ];
+  ]
+  ++ (if useQt6 then [ pyqt6 ] else [ pyqt5 ]);
 }
