@@ -10,20 +10,16 @@
       pkgs = forAllSystems (system: (nixpkgs.legacyPackages.${system}.extend self.overlays.default));
     in
     {
-      overlays = {
-        default = (
-          final: prev: {
-            pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-              (pfinal: pprev: {
-                triangle = pfinal.callPackage ./triangle.nix { };
-                calcam = pfinal.callPackage ./calcam-lib.nix { };
-              })
-            ];
-            calcam-qt5 = final.libsForQt5.callPackage ./calcam-gui.nix { useQt6 = false; };
-            calcam-qt6 = final.qt6Packages.callPackage ./calcam-gui.nix { useQt6 = true; };
-            calcam = final.calcam-qt6;
-          }
-        );
+      overlays.default = final: prev: {
+        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+          (pfinal: pprev: {
+            triangle = pfinal.callPackage ./triangle.nix { };
+            calcam = pfinal.callPackage ./calcam-lib.nix { };
+          })
+        ];
+        calcam-qt5 = final.libsForQt5.callPackage ./calcam-gui.nix { useQt6 = false; };
+        calcam-qt6 = final.qt6Packages.callPackage ./calcam-gui.nix { useQt6 = true; };
+        calcam = final.calcam-qt6;
       };
       packages = forAllSystems (system: {
         inherit (pkgs.${system}) calcam-qt5 calcam-qt6 calcam;
