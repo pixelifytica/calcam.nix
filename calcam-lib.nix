@@ -15,13 +15,13 @@
 }:
 buildPythonPackage rec {
   pname = "calcam";
-  version = "2.16.2";
+  version = "2.16.3";
   pyproject = true;
   src = fetchFromGitHub {
     owner = "euratom-software";
     repo = "calcam";
     tag = "${version}";
-    hash = "sha256-/OadKEdAIJBcRvbsSwR9KLMc8HdzUX24pxt6+byOXGI=";
+    hash = "sha256-v5upf8G0YoBmhmPUBvVwuvflQ/3RhO/ytCAZJWL3KwI=";
   };
   dontCheckRuntimeDeps = useQt6;
   build-system = [ setuptools ];
